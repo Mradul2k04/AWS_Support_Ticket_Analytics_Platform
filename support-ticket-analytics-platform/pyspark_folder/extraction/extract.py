@@ -1,10 +1,10 @@
-from pyspark.sql.types import *
-from pyspark.sql import SparkSession
+from pyspark.sql.types import * # type: ignore
+from pyspark.sql import SparkSession # type: ignore
 from config.config import BUCKET_NAME
 from utils.logger import logger
-from pyspark.sql import functions as func
-import os
-import boto3
+from pyspark.sql import functions as func # type: ignore
+import os 
+import boto3 # type: ignore
 from config.config import ISSUES_FILE, HISTORY_FILE
 S3_RAW_BUCKET = f"s3a://{BUCKET_NAME}/raw/"
 
