@@ -1,5 +1,5 @@
-from pyspark.sql import functions as func
-from pyspark.sql.types import LongType
+from pyspark.sql import functions as func # type: ignore
+from pyspark.sql.types import LongType # type: ignore
 from utils.logger import logger
 from config.config import BUCKET_NAME,RDS_HOST,RDS_PORT,RDS_DB,RDS_PASS,RDS_USER
 import os
