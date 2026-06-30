@@ -11,3 +11,9 @@ CURATED_PREFIX = os.getenv("CURATED_PREFIX")
 
 ISSUES_FILE = os.getenv("ISSUES_FILE")
 HISTORY_FILE = os.getenv("HISTORY_FILE")
+
+RDS_HOST = os.getenv("RDS_HOST")
+RDS_PORT = os.getenv("RDS_PORT")
+RDS_DB = os.getenv("RDS_DB")
+RDS_PASS = os.getenv("RDS_PASS")
+RDS_USER = os.getenv("RDS_USER")
