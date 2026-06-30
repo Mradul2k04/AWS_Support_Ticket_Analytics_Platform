@@ -1,5 +1,5 @@
 from config.config import BUCKET_NAME, AWS_REGION
-from botocore.exceptions import ClientError
+from botocore.exceptions import ClientError # type: ignore
 from aws.s3_bucket.s3_helper import s3_client
 def create_bucket():
     try:
