@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS dim_customers (
     reporter_name VARCHAR(120) UNIQUE NOT NULL
 );
 
+
 CREATE TABLE IF NOT EXISTS dim_agents (
     agent_id   BIGINT       PRIMARY KEY,
     agent_name VARCHAR(120) UNIQUE NOT NULL
