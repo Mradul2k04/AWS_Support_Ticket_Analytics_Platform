@@ -24,8 +24,8 @@ def main():
     # upload_file("datasets/issues.csv", RAW_PREFIX + "issues.csv")
     # upload_file("datasets/issues_change_history.csv",RAW_PREFIX + "issues_change_history.csv")
 
-    # logger.info("Pipeline Started....")
-    # Step 1 — Create Spark session
+    logger.info("Pipeline Started....")
+    #Step 1 — Create Spark session
     spark = create_spark_session()
     hadoop_conf = spark._jsc.hadoopConfiguration()
 
