@@ -1,4 +1,3 @@
-from glob import glob
 import shutil
 import os
 from utils.logger import logger
@@ -11,48 +10,57 @@ from pyspark.sql import SparkSession
 from pyspark_folder.transformation.transformation import transform
 from pyspark_folder.loading.load import load
 from sql.cleanup_tables import cleanup_table
-
+from pyspark_folder.loading.load import write_rds
 def main():
+    try:
     
-    #CREATING A S3 BUCKET USING BOTO3 SCRIPTS
-    # create_bucket()
+        #CREATING A S3 BUCKET USING BOTO3 SCRIPTS
+        # create_bucket()
 
-    #CREATING FOLDERS INSIDE S3 BUCKET (raw/ , curated/ )
-    # create_folder()
+        #CREATING FOLDERS INSIDE S3 BUCKET (raw/ , curated/ )
+        # create_folder()
 
-    #UPLOADING FILES INSIDE S3 BUCKET FOLDERS
-    # upload_file("datasets/issues.csv", RAW_PREFIX + "issues.csv")
-    # upload_file("datasets/issues_change_history.csv",RAW_PREFIX + "issues_change_history.csv")
+        #UPLOADING FILES INSIDE S3 BUCKET FOLDERS
+        # upload_file("datasets/issues.csv", RAW_PREFIX + "issues.csv")
+        # upload_file("datasets/issues_change_history.csv",RAW_PREFIX + "issues_change_history.csv")
 
-    # logger.info("Pipeline Started....")
-    # Step 1 — Create Spark session
-    spark = create_spark_session()
-    hadoop_conf = spark._jsc.hadoopConfiguration()
+        logger.info("Pipeline Started....")
+        #Step 1 — Create Spark session
+        spark = create_spark_session()
+        hadoop_conf = spark._jsc.hadoopConfiguration()
 
-    hadoop_conf.set(
-    "fs.s3a.aws.credentials.provider",
-    "com.amazonaws.auth.DefaultAWSCredentialsProviderChain"
+        hadoop_conf.set(
+        "fs.s3a.aws.credentials.provider",
+        "org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider"
     )
-    # Step 2 — Extract
-    logger.info("Starting extraction...")
-    issues_df, change_df =extract(spark)
+        # Step 2 — Extract
+        logger.info("Starting extraction...")
+        issues_df, change_df =extract(spark)
 
-    # Step 3 — Transform
-    logger.info("Starting transformation...")
-    fact_df, agent_agg_df, resolution_perf_df, cat_trends_df = transform(issues_df, change_df)
-    fact_df.count()
+        # Step 3 — Transform
+        logger.info("Starting transformation...")
+        fact_df, agent_agg_df, resolution_perf_df, cat_trends_df = transform(issues_df, change_df)
+        fact_df.count()
+        
+        # Step 3 — Load
+        logger.info("Starting load...")
+        load(fact_df, agent_agg_df, resolution_perf_df, cat_trends_df)
+
+        logger.info("Pipeline complete...")
+
+        logger.info("RDS Load Started...")
     
-    # Step 3 — Load
-    logger.info("Starting load...")
-    load(fact_df, agent_agg_df, resolution_perf_df, cat_trends_df)
+    except Exception as e:
+        logger.exception("ETL Pipeline Failed")
+        logger.error(f"Reason : {str(e)}")
 
-    spark.stop()
-    logger.info("Pipeline complete...")
+    finally:
+        if spark is not None:
+            logger.info("Stopping Spark Session...")
+            spark.stop()
+            logger.info("Spark Session stopped.")
 
-
-    
-
-
+        logger.info("Pipeline execution finished.")
 
    
 if __name__=="__main__":
