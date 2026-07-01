@@ -60,49 +60,53 @@ def extract(spark):
     """
 
    # Read with header only — let Spark use actual CSV column names
-    issues_raw = (
-        spark.read
-        .option("header", "true")
-        .option("inferSchema", "false")
-        .csv(f"{S3_RAW_BUCKET}issues.csv")
-    )
+    try:
+        issues_raw = (
+            spark.read
+            .option("header", "true")
+            .option("inferSchema", "false")
+            .csv(f"{S3_RAW_BUCKET}issues.csv")
+        )
 
-    # Select and cast ONLY the columns we need — this IS the explicit schema
-    issues_df = issues_raw.select(
-        func.col("id").cast(LongType()),
-        func.col("issue_num").cast(LongType()),
-        func.col("issue_proj").cast(StringType()),
-        func.col("issue_reporter").cast(StringType()),
-        func.col("issue_assignee").cast(StringType()),
-        func.col("issue_contr_count").cast(IntegerType()),
-        func.col("issue_priority").cast(StringType()),
-        func.col("issue_type").cast(StringType()),
-        func.col("issue_created").cast(StringType()),        # cast in transform
-        func.col("issue_resolution_date").cast(StringType()),# cast in transform
-        func.col("issue_resolution").cast(StringType()),
-        func.col("issue_status").cast(StringType()),
-        func.col("issue_comments_count").cast(IntegerType()),
-        func.col("last_change_date").cast(StringType()),     # cast in transform
-        func.col("wf_total_time").cast(LongType()),
-        func.col("processing_steps").cast(IntegerType()),
-    )
+        # Select and cast ONLY the columns we need — this IS the explicit schema
+        issues_df = issues_raw.select(
+            func.col("id").cast(LongType()),
+            func.col("issue_num").cast(LongType()),
+            func.col("issue_proj").cast(StringType()),
+            func.col("issue_reporter").cast(StringType()),
+            func.col("issue_assignee").cast(StringType()),
+            func.col("issue_contr_count").cast(IntegerType()),
+            func.col("issue_priority").cast(StringType()),
+            func.col("issue_type").cast(StringType()),
+            func.col("issue_created").cast(StringType()),        # cast in transform
+            func.col("issue_resolution_date").cast(StringType()),# cast in transform
+            func.col("issue_resolution").cast(StringType()),
+            func.col("issue_status").cast(StringType()),
+            func.col("issue_comments_count").cast(IntegerType()),
+            func.col("last_change_date").cast(StringType()),     # cast in transform
+            func.col("wf_total_time").cast(LongType()),
+            func.col("processing_steps").cast(IntegerType()),
+        )
 
-    # Change history — same approach
-    change_raw = (
-        spark.read
-        .option("header", "true")
-        .option("inferSchema", "false")
-        .csv(f"{S3_RAW_BUCKET}issues_change_history.csv")
-    )
+        # Change history — same approach
+        change_raw = (
+            spark.read
+            .option("header", "true")
+            .option("inferSchema", "false")
+            .csv(f"{S3_RAW_BUCKET}issues_change_history.csv")
+        )
 
-    change_df = change_raw.select(
-        func.col("id").cast(LongType()),
-        func.col("issueid").cast(LongType()),
-        func.col("field").cast(StringType()),
-        func.col("value").cast(StringType()),
-        func.col("created").cast(StringType()),              # cast in transform
-        func.col("change_group_id").cast(LongType()),
-    )
+        change_df = change_raw.select(
+            func.col("id").cast(LongType()),
+            func.col("issueid").cast(LongType()),
+            func.col("field").cast(StringType()),
+            func.col("value").cast(StringType()),
+            func.col("created").cast(StringType()),              # cast in transform
+            func.col("change_group_id").cast(LongType()),
+        )
+    except Exception as e:
+        logger.exception("Failed to read files from s3 bucket.")
+        raise
 
     issues_count = issues_df.count()
     change_count = change_df.count()
